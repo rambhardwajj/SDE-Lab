@@ -120,6 +120,17 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.SessionScalarFieldEnum = {
+  id: 'id',
+  refreshToken: 'refreshToken',
+  userId: 'userId',
+  userAgent: 'userAgent',
+  ipAddress: 'ipAddress',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  expiresAt: 'expiresAt'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   userName: 'userName',
@@ -134,7 +145,6 @@ exports.Prisma.UserScalarFieldEnum = {
   emailVerificationExpiry: 'emailVerificationExpiry',
   resetPasswordToken: 'resetPasswordToken',
   resetPasswordExpiry: 'resetPasswordExpiry',
-  refreshToken: 'refreshToken',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -159,6 +169,7 @@ exports.Role = exports.$Enums.Role = {
 };
 
 exports.Prisma.ModelName = {
+  Session: 'Session',
   User: 'User'
 };
 
