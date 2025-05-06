@@ -1,11 +1,12 @@
 
 
 import { Router } from "express";
-import { registerUser } from "../controllers/register.controller";
+import { registerUser, verifyUser } from "../controllers/register.controller";
 import { upload } from "../middlewares/multer.middleware";
 
 const router = Router()
 
-router.post('/register', upload.single("avatar") ,  registerUser)
+router.post('/auth/register', upload.single("avatar") ,  registerUser)
+router.get('/auth/verify/:token',  verifyUser)
 
 export default router

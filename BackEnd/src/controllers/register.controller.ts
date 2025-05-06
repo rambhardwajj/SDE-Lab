@@ -65,7 +65,7 @@ const generateToken = function () {
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
   const { userName, email, password, fullName, role } = handleZodError(
     validateRegisterData(req.body)
-  );
+  )
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -112,9 +112,14 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
 const verifyUser  = asyncHandler( async(req: Request, res: Response) =>{
   const { token } = req.params;
 
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+
   const user = await db.user.findFirst({
     where:{
-      emailVerificationToken : token
+      emailVerificationToken : hashedToken
     }
   })
 
@@ -122,12 +127,11 @@ const verifyUser  = asyncHandler( async(req: Request, res: Response) =>{
     throw new CustomError(ResponseStatus.BadRequest, "Invalid or expired token");
   }
 
-  // Optional: Check if token is expired
   if (user.emailVerificationExpiry && user.emailVerificationExpiry < new Date()) {
-    throw new CustomError(ResponseStatus.BadRequest, "Token has expired");
+    throw new CustomError(ResponseStatus.BadRequest, "Token expired, time limit exceeded for the user to verify through mail");
   }
 
-  await db.user.update({
+  const verifiedUser = await db.user.update({
     where: { id: user.id },
     data: {
       isEmailVerified: true,
@@ -136,8 +140,29 @@ const verifyUser  = asyncHandler( async(req: Request, res: Response) =>{
     },
   });
 
-  
+  const accessToken = await generateAccessToken(verifiedUser)
+  const refreshToken = await generateRefreshToken(verifiedUser);
 
+  console.log( "acc= ", accessToken)
+  console.log("ref= ", refreshToken)
+
+  await db.user.update({
+    where: { id: verifiedUser.id },
+    data: { refreshToken },
+  });
+
+  res
+  .status(ResponseStatus.Success)
+  .cookie("accessToken", accessToken, {
+    httpOnly: true,
+    sameSite: "strict",
+  })
+  .cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    sameSite: "strict",
+  })
+  .json(new ApiResponse(ResponseStatus.Success, null, "Register Successful, welcome to SdeLab"));
+  
 })
 
-export { registerUser };
+export { registerUser, verifyUser };

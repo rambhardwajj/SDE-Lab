@@ -118,6 +118,6 @@ const sendResetPasswordMail = async (
     "Reset Your Password",
     resetPasswordMailContent(username, link)
   );
-};
+}
 
 export { sendVerificationMail, sendResetPasswordMail };
