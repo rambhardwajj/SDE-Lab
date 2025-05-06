@@ -1,0 +1,22 @@
+import express , {Express } from 'express'
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import { healthCheck } from './controllers/healthCheck.controller';
+import userRouter from "./routes/user.route"
+import { errorHandler } from './middlewares/error.middleware';
+
+const app :Express  =  express();
+
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
+app.use(cookieParser());
+app.use(cors())
+
+app.get('/', healthCheck)
+app.use("/api/v1/user", userRouter )
+
+
+app.use(errorHandler)
+
+
+export default app;
