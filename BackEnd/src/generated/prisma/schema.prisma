@@ -19,16 +19,22 @@ enum Role {
   USER
 }
 
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
 model Session {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   refreshToken String
-  user         User     @relation(fields: [userId], references: [id])
   userId       String
+  user         User      @relation(fields: [userId], references: [id])
   userAgent    String?
   ipAddress    String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  expiresAt    DateTime?
 }
 
 model User {
@@ -39,9 +45,8 @@ model User {
   fullName String?
   role     Role    @default(USER)
 
-  // Avatar stored as separate columns for url and localPath
   avatarUrl       String? // Optional
-  avatarLocalPath String? // Optional
+  avatarLocalPath String? // remove 
 
   isEmailVerified Boolean @default(false)
 
@@ -50,8 +55,44 @@ model User {
   resetPasswordToken      String?
   resetPasswordExpiry     DateTime?
 
-  sessions Session[] // 👈 Add this line
+  sessions Session[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Problem   Problem[]
+}
+
+model Problem {
+  id              String     @id @default(uuid())
+  title           String     @unique
+  difficulty      Difficulty
+  tags            String[]
+  companies       String?
+  hints           String[]
+  description     String
+  examples        Json
+  constraints     String[]
+  followUp        String?
+  editorial       Json?
+  createdByUserId String
+
+  codeSnippets       Json
+  testcases          Json
+  referenceSolutions Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Realtionship
+  user User @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+}
+
+model Submissions {
+  id            String   @id @default(uuid())
+  userId        String
+  problemId     String
+  submittedCode Json
+  language      String
+  status        String
+  createdAt     DateTime @default(now())
 }

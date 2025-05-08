@@ -64,11 +64,11 @@ model User {
 
 model Problem{
   id                 String     @id @default(uuid())
-  title              String          
+  title              String     @unique
   difficulty         Difficulty
   tags               String[]
   companies          String?
-  hints              String?
+  hints              String[]
   description        String
   examples           Json
   constraints        String[]
