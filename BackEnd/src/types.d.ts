@@ -5,7 +5,7 @@ export type DecodedUser = Pick<
   User,
   "id" | "userName" | "role"
 > & {
-  sessionId: string; // ✅ Add this to support per-session operations
+  sessionId: string; //  Add this to support per-session operations
 };
 
 declare global {

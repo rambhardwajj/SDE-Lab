@@ -4,6 +4,7 @@ import { handleZodError } from "../utils/handleZodErrors";
 import {
   validateEmailData,
   validateLoginData,
+  validatePasswordData,
   validateRegisterData,
 } from "../validators/user.validators";
 import { CustomError } from "../utils/CustomError";
@@ -17,9 +18,10 @@ import crypto from "crypto";
 import { User } from "../generated/prisma";
 import ms, { StringValue } from "ms";
 import { db } from "../configs/db";
-import { sendVerificationMail } from "../utils/sendMail";
+import { sendResetPasswordMail, sendVerificationMail } from "../utils/sendMail";
 import { ApiResponse } from "../utils/ApiResponse";
 import { requiredUserInfo } from "../utils/requiredUserInfo";
+import { DecodedUser } from "../types";
 
 const isPasswordCorrect = async function (password: string, user: User) {
   return await bcrypt.compare(password, user.password);
@@ -113,12 +115,16 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
 
   await sendVerificationMail(user.userName, user.email, unHashedToken);
 
-  const requiredUser = requiredUserInfo(user)
+  const requiredUser = requiredUserInfo(user);
 
   res
     .status(200)
     .json(
-      new ApiResponse(ResponseStatus.Success,requiredUser, "User Register Successfully")
+      new ApiResponse(
+        ResponseStatus.Success,
+        requiredUser,
+        "User Register Successfully"
+      )
     );
 });
 
@@ -130,22 +136,33 @@ const verifyUser = asyncHandler(async (req: Request, res: Response) => {
       emailVerificationToken: hashedToken,
     },
   });
-  if (!user) throw new CustomError(ResponseStatus.BadRequest,"Invalid or expired token");
-  
+  if (!user)
+    throw new CustomError(
+      ResponseStatus.BadRequest,
+      "Invalid or expired token"
+    );
+
   if (user.emailVerificationExpiry && user.emailVerificationExpiry < new Date())
-    throw new CustomError(ResponseStatus.BadRequest,"Token expired, time limit exceeded for the user to verify through mail");
+    throw new CustomError(
+      ResponseStatus.BadRequest,
+      "Token expired, time limit exceeded for the user to verify through mail"
+    );
 
   const verifiedUser = await db.user.update({
     where: { id: user.id },
-    data: {emailVerificationToken: null,isEmailVerified: true,emailVerificationExpiry: null,},
+    data: {
+      emailVerificationToken: null,
+      isEmailVerified: true,
+      emailVerificationExpiry: null,
+    },
   });
-  
 
   // Session Creation
   const userAgent = req.headers["user-agent"] || "Unknown";
   const ipAddress = req.ip || "Unknown";
-  const sessionExpiry = new Date(Date.now() + ms(envConfig.REFRESH_TOKEN_EXPIRY as StringValue));
-
+  const sessionExpiry = new Date(
+    Date.now() + ms(envConfig.REFRESH_TOKEN_EXPIRY as StringValue)
+  );
 
   // console.log("agent= ", userAgent);
   // console.log("ip= ", ipAddress);
@@ -160,10 +177,10 @@ const verifyUser = asyncHandler(async (req: Request, res: Response) => {
       "You have exceeded the maximum number of devices (5). Please logout from another device to continue."
     );
   }
-  
+
   const session = await db.session.create({
     data: {
-      refreshToken : "",
+      refreshToken: "",
       userId: user.id,
       userAgent,
       ipAddress,
@@ -173,10 +190,10 @@ const verifyUser = asyncHandler(async (req: Request, res: Response) => {
 
   const accessToken = await generateAccessToken(verifiedUser, session.id);
   const refreshToken = await generateRefreshToken(verifiedUser, session.id);
-  
+
   // console.log("acc= ", accessToken);
   // console.log("ref= ", refreshToken);
-  
+
   await db.session.update({
     where: { id: session.id },
     data: { refreshToken },
@@ -221,39 +238,39 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const existingSession = await db.session.findFirst({
-    where:{
+    where: {
       userId: user.id,
       userAgent,
-      ipAddress
-    }
-  })
-
-
+      ipAddress,
+    },
+  });
 
   const activeSessions = await db.session.count({
-    where:{userId: user.id}
-  })
-  if( activeSessions>= 5 || !existingSession ){
-    throw new CustomError(ResponseStatus.Forbidden, "Maximum number of active sessions reached");
+    where: { userId: user.id },
+  });
+  if (activeSessions >= 5 || !existingSession) {
+    throw new CustomError(
+      ResponseStatus.Forbidden,
+      "Maximum number of active sessions reached"
+    );
   }
 
   let accessToken;
   let refreshToken;
-  if( existingSession ){
+  if (existingSession) {
     await db.session.update({
       where: { id: existingSession.id },
-      data:{
+      data: {
         refreshToken,
-        expiresAt: sessionExpiry
-      }
-    })
+        expiresAt: sessionExpiry,
+      },
+    });
     accessToken = await generateAccessToken(user, existingSession.id);
     refreshToken = await generateRefreshToken(user, existingSession.id);
-  }
-  else{
+  } else {
     const session = await db.session.create({
       data: {
-        refreshToken : "",
+        refreshToken: "",
         userId: user.id,
         userAgent,
         ipAddress,
@@ -263,7 +280,6 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     accessToken = await generateAccessToken(user, session.id);
     refreshToken = await generateRefreshToken(user, session.id);
   }
-
 
   res
     .status(200)
@@ -280,7 +296,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
 const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user.id;
-  const sessionId = req.user.sessionId
+  const sessionId = req.user.sessionId;
   if (!sessionId || !userId) {
     throw new CustomError(400, "User session not found");
   }
@@ -352,10 +368,185 @@ const resendEmailVerification = asyncHandler(async (req, res) => {
     );
 });
 
+const forgetPasswrod = asyncHandler(async (req, res) => {
+  const { email } = handleZodError(validateEmailData(req.body));
+  const user = await db.user.findUnique({ where: { email } });
+
+  if (!user) {
+    throw new CustomError(
+      ResponseStatus.NotFound,
+      "User with this email does not exist"
+    );
+  }
+
+  const { hashedToken, tokenExpiry, unHashedToken } = generateToken();
+  await db.user.update({
+    where: { id: user.id },
+    data: {
+      resetPasswordToken: hashedToken,
+      resetPasswordExpiry: tokenExpiry,
+    },
+  });
+
+  await sendResetPasswordMail(user.email, user.userName, unHashedToken);
+
+  res.status(ResponseStatus.Success).json({
+    success: true,
+    message: "Password reset link sent to your email",
+  });
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { token } = req.params;
+  const { password } = handleZodError(validatePasswordData(req.body));
+
+  if (!token) {
+    throw new CustomError(ResponseStatus.NotFound, "Token is required");
+  }
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  const user = await db.user.findFirst({
+    where: {
+      resetPasswordToken: hashedToken,
+      resetPasswordExpiry: { gt: new Date() },
+    },
+  });
+
+  if (!user) {
+    throw new CustomError(
+      ResponseStatus.Unauthorized,
+      "resetPassword token is expired or invalid"
+    );
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await db.user.update({
+    where: { id: user.id },
+    data: {
+      password: hashedPassword,
+      resetPasswordToken: null,
+      resetPasswordExpiry: null,
+    },
+  });
+
+  await db.session.deleteMany({
+    where: {
+      userId: user.id,
+      NOT: {
+        id: req.user.sessionId,
+      },
+    },
+  });
+
+  res
+    .status(200)
+    .json(new ApiResponse(ResponseStatus.Success, null, "Password reset done"));
+});
+
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  const sessionId = req.cookies?.sessionId;
+  if (!sessionId) {
+    throw new CustomError(
+      ResponseStatus.Unauthorized,
+      "sessionId in cookies is missing"
+    );
+  }
+  const currRefreshToken = req.cookies?.sessionId;
+  if (!currRefreshToken) {
+    throw new CustomError(
+      ResponseStatus.Unauthorized,
+      "Refresh token is missing"
+    );
+  }
+
+  let jwtVerified;
+  try {
+    jwtVerified = jwt.verify(currRefreshToken, envConfig.REFRESH_TOKEN_SECRET);
+  } catch (error) {
+    throw new CustomError(400, "Invalid refresh token");
+  }
+  const decoded = jwtVerified as DecodedUser;
+
+  const currUser = await db.user.findUnique({
+    where: {
+      email: decoded.userName,
+    },
+  });
+  if (!currUser) {
+    throw new CustomError(400, "Decoded user doesnot exists");
+  }
+
+  const accessToken = await generateAccessToken(currUser, decoded.sessionId);
+  const refreshToken = await generateRefreshToken(currUser, decoded.sessionId);
+
+  await db.session.update({
+    where: { id: decoded.sessionId },
+    data: {
+      refreshToken,
+    },
+  });
+
+  res
+    .status(200)
+    .cookie("accessToken", accessToken, {
+      httpOnly: true,
+      sameSite: "strict",
+    })
+    .cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+    })
+    .json(new ApiResponse(200, null, "Access token refreshed"));
+});
+
+const logoutAllSessions = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const sessionId = req.cookies.sessionId;
+
+  const sessionData = await db.session.deleteMany({
+    where: {
+      userId: id,
+      NOT:{
+        id: sessionId
+      }
+     },
+  });
+
+  res.status(ResponseStatus.Success).json(new ApiResponse(ResponseStatus.Success, null, "logged from all other devices"))
+
+});
+
+const getAllSessions = asyncHandler(async (req, res) =>{
+  const {id } = req.user
+  const allActiveSessions = await db.session.findMany({
+    where: {
+      userId: id
+    },
+    select:{
+      id: true,
+      ipAddress:true,
+      userAgent: true,
+      createdAt: true,
+      expiresAt: true,
+    },
+    orderBy: {
+      createdAt: "desc"
+    }
+  })
+
+  res.status(200).json(new ApiResponse( ResponseStatus.Success,allActiveSessions, "Sessions returned" ))
+})
+
 export {
   registerUser,
   verifyUser,
   logoutUser,
   loginUser,
   resendEmailVerification,
+  forgetPasswrod,
+  resetPassword,
+  refreshAccessToken,
+  logoutAllSessions,
+  getAllSessions
 };

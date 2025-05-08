@@ -32,12 +32,13 @@ const loginSchema = RegisterSchema.omit({
 });
 
 const emailVerification = RegisterSchema.pick({ email: true });
-
+const passwordVerification = RegisterSchema.pick({password: true})
 
 // types
 type RegisterData = z.infer<typeof RegisterSchema>;
 type LoginData = z.infer<typeof loginSchema>;
 type EmailVerificationData = z.infer<typeof emailVerification>;
+type PasswordVerificationData = z.infer<typeof passwordVerification>;
 
 
 const validateRegisterData = (data: RegisterData) => {
@@ -51,4 +52,8 @@ const validateLoginData = (data: LoginData) => {
 const validateEmailData = (data : EmailVerificationData) =>{
   return emailVerification.safeParse(data);
 }
-export { validateRegisterData, validateLoginData , validateEmailData};
+const validatePasswordData = (data : PasswordVerificationData) =>{
+  return passwordVerification.safeParse(data);
+}
+
+export { validatePasswordData,validateRegisterData, validateLoginData , validateEmailData};
