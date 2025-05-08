@@ -15,10 +15,11 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { User } from "../generated/prisma";
-import ms from "ms";
+import ms, { StringValue } from "ms";
 import { db } from "../configs/db";
 import { sendVerificationMail } from "../utils/sendMail";
 import { ApiResponse } from "../utils/ApiResponse";
+import { requiredUserInfo } from "../utils/requiredUserInfo";
 
 const isPasswordCorrect = async function (password: string, user: User) {
   return await bcrypt.compare(password, user.password);
@@ -78,6 +79,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
   const existingUser = await db.user.findUnique({
     where: { email },
   });
+
   if (existingUser) {
     throw new CustomError(ResponseStatus.Conflict, "Email already registered");
   }
@@ -111,10 +113,12 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
 
   await sendVerificationMail(user.userName, user.email, unHashedToken);
 
+  const requiredUser = requiredUserInfo(user)
+
   res
     .status(200)
     .json(
-      new ApiResponse(ResponseStatus.Success, {}, "User Register Successfully")
+      new ApiResponse(ResponseStatus.Success,requiredUser, "User Register Successfully")
     );
 });
 
@@ -140,7 +144,7 @@ const verifyUser = asyncHandler(async (req: Request, res: Response) => {
   // Session Creation
   const userAgent = req.headers["user-agent"] || "Unknown";
   const ipAddress = req.ip || "Unknown";
-  const sessionExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const sessionExpiry = new Date(Date.now() + ms(envConfig.REFRESH_TOKEN_EXPIRY as StringValue));
 
 
   // console.log("agent= ", userAgent);
@@ -166,11 +170,12 @@ const verifyUser = asyncHandler(async (req: Request, res: Response) => {
       expiresAt: sessionExpiry,
     },
   });
+
   const accessToken = await generateAccessToken(verifiedUser, session.id);
   const refreshToken = await generateRefreshToken(verifiedUser, session.id);
   
-  console.log("acc= ", accessToken);
-  console.log("ref= ", refreshToken);
+  // console.log("acc= ", accessToken);
+  // console.log("ref= ", refreshToken);
   
   await db.session.update({
     where: { id: session.id },
@@ -215,25 +220,50 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     throw new CustomError(ResponseStatus.Unauthorized, "Incorrect Password");
   }
 
+  const existingSession = await db.session.findFirst({
+    where:{
+      userId: user.id,
+      userAgent,
+      ipAddress
+    }
+  })
+
+
+
   const activeSessions = await db.session.count({
     where:{userId: user.id}
   })
-  if( activeSessions>= 5 ){
+  if( activeSessions>= 5 || !existingSession ){
     throw new CustomError(ResponseStatus.Forbidden, "Maximum number of active sessions reached");
   }
 
+  let accessToken;
+  let refreshToken;
+  if( existingSession ){
+    await db.session.update({
+      where: { id: existingSession.id },
+      data:{
+        refreshToken,
+        expiresAt: sessionExpiry
+      }
+    })
+    accessToken = await generateAccessToken(user, existingSession.id);
+    refreshToken = await generateRefreshToken(user, existingSession.id);
+  }
+  else{
+    const session = await db.session.create({
+      data: {
+        refreshToken : "",
+        userId: user.id,
+        userAgent,
+        ipAddress,
+        expiresAt: sessionExpiry,
+      },
+    });
+    accessToken = await generateAccessToken(user, session.id);
+    refreshToken = await generateRefreshToken(user, session.id);
+  }
 
-  const session = await db.session.create({
-    data: {
-      refreshToken : "",
-      userId: user.id,
-      userAgent,
-      ipAddress,
-      expiresAt: sessionExpiry,
-    },
-  });
-  const accessToken = await generateAccessToken(user, session.id);
-  const refreshToken = await generateRefreshToken(user, session.id);
 
   res
     .status(200)

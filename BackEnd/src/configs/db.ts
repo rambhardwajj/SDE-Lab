@@ -12,4 +12,5 @@ export const db = prisma
 if( envConfig.NODE_ENV !== "production") 
     globalForPrisma.prisma = db
 
+
 // This setup avoids creating multiple Prisma instances during hot reloads, by storing and reusing the client through globalThis  only in dev mode.
