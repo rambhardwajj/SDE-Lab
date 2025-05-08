@@ -514,8 +514,23 @@ const logoutAllSessions = asyncHandler(async (req, res) => {
   });
 
   res.status(ResponseStatus.Success).json(new ApiResponse(ResponseStatus.Success, null, "logged from all other devices"))
-
+  
 });
+
+const logoutFromSessionId = asyncHandler(async(req , res) =>{
+  const {sessionId} = req.params
+ 
+
+  if( !sessionId) throw new CustomError(400, "session Id doesnot exists") 
+
+
+  await db.session.delete({
+    where:{id: sessionId}
+  })
+
+  res.status(200).json(new ApiResponse(200, null, "logged out from session"))
+
+})
 
 const getAllSessions = asyncHandler(async (req, res) =>{
   const {id } = req.user
@@ -538,6 +553,7 @@ const getAllSessions = asyncHandler(async (req, res) =>{
   res.status(200).json(new ApiResponse( ResponseStatus.Success,allActiveSessions, "Sessions returned" ))
 })
 
+
 export {
   registerUser,
   verifyUser,
@@ -548,5 +564,6 @@ export {
   resetPassword,
   refreshAccessToken,
   logoutAllSessions,
-  getAllSessions
+  getAllSessions, 
+  logoutFromSessionId
 };

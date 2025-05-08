@@ -1,7 +1,7 @@
 
 
 import { Router } from "express";
-import { forgetPasswrod, getAllSessions, loginUser, logoutAllSessions, logoutUser, refreshAccessToken, registerUser, resendEmailVerification, resetPassword, verifyUser } from "../controllers/user.controller";
+import { forgetPasswrod, getAllSessions, loginUser, logoutAllSessions, logoutFromSessionId, logoutUser, refreshAccessToken, registerUser, resendEmailVerification, resetPassword, verifyUser } from "../controllers/user.controller";
 import { upload } from "../middlewares/multer.middleware";
 import { isLoggedIn } from "../middlewares/auth.middleware";
 
@@ -17,6 +17,7 @@ router.get('/auth/resetPassword', isLoggedIn,  resetPassword)
 router.get('/auth/refreshAccessToken', refreshAccessToken )
 router.get('/auth/logoutSessions', isLoggedIn, logoutAllSessions)
 router.get('/auth/getAllSessions', isLoggedIn, getAllSessions)
+router.get('/auth/deleteBySessionId', isLoggedIn, logoutFromSessionId)
 
 
 export default router
