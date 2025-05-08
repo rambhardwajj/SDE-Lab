@@ -553,7 +553,6 @@ const getAllSessions = asyncHandler(async (req, res) =>{
   res.status(200).json(new ApiResponse( ResponseStatus.Success,allActiveSessions, "Sessions returned" ))
 })
 
-
 export {
   registerUser,
   verifyUser,

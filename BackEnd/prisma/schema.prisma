@@ -14,10 +14,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum Role {
   ADMIN 
   USER
+}
+
+enum Difficulty {
+  EASY 
+  MEDIUM
+  HARD 
 }
 
 model Session {
@@ -52,8 +57,33 @@ model User {
 
   sessions                Session[] 
 
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  createdAt               DateTime   @default(now())
+  updatedAt               DateTime   @updatedAt
+  Problem                 Problem[]  
 }
 
+model Problem{
+  id                 String     @id @default(uuid())
+  title              String          
+  difficulty         Difficulty
+  tags               String[]
+  companies          String?
+  hints              String?
+  description        String
+  examples           Json
+  constraints        String[]
+  followUp           String?
+  editorial          Json?
+  createdByUserId    String
 
+  codeSnippets       Json
+  testcases          Json
+  referenceSolutions Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Realtionship
+  user       User            @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+
+}
