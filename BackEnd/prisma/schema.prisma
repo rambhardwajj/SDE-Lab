@@ -78,12 +78,22 @@ model Problem{
 
   codeSnippets       Json
   testcases          Json
-  referenceSolutions Json?
+  referenceSolutions Json? 
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   // Realtionship
-  user       User            @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+  user       User    @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
 
+}
+
+model Submissions {
+  id                 String     @id @default(uuid())
+  userId  String 
+  problemId  String
+  submittedCode Json
+  language  String
+  status String
+  createdAt DateTime @default(now())
 }

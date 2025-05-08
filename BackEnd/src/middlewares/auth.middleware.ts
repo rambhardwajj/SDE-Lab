@@ -23,4 +23,15 @@ const isLoggedIn = async (req: Request, res: Response, next: NextFunction) =>{
         throw new CustomError(ResponseStatus.Unauthorized, "Invalid token, Login failed")
     }
 }
-export {isLoggedIn}
+
+const isAdmin = async( req: Request, res: Response, next: NextFunction) =>{
+    const {role} = req.user;
+    if( !role) throw new CustomError(400, "User role not found")
+
+    if(role !== Role.ADMIN){
+        throw new CustomError(ResponseStatus.BadRequest, "You are not an admin")
+    }
+    next()
+}
+
+export {isLoggedIn , isAdmin}

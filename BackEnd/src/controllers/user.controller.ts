@@ -33,6 +33,7 @@ const generateAccessToken = async function (user: User, sessionId: string) {
       id: user.id,
       email: user.email,
       userName: user.userName,
+      role: user.role,
       sessionId,
     },
     envConfig.ACCESS_TOKEN_SECRET,
