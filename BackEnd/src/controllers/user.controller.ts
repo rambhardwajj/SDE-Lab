@@ -238,6 +238,8 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     throw new CustomError(ResponseStatus.Unauthorized, "Incorrect Password");
   }
 
+  console.log(user.id, userAgent, ipAddress);
+
   const existingSession = await db.session.findFirst({
     where: {
       userId: user.id,
@@ -245,11 +247,12 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
       ipAddress,
     },
   });
+  console.log(existingSession);
 
   const activeSessions = await db.session.count({
     where: { userId: user.id },
   });
-  if (activeSessions >= 5 || !existingSession) {
+  if (activeSessions >= 5 && !existingSession) {
     throw new CustomError(
       ResponseStatus.Forbidden,
       "Maximum number of active sessions reached"
@@ -259,6 +262,8 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   let accessToken;
   let refreshToken;
   if (existingSession) {
+    accessToken = await generateAccessToken(user, existingSession.id);
+    refreshToken = await generateRefreshToken(user, existingSession.id);
     await db.session.update({
       where: { id: existingSession.id },
       data: {
@@ -266,8 +271,6 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
         expiresAt: sessionExpiry,
       },
     });
-    accessToken = await generateAccessToken(user, existingSession.id);
-    refreshToken = await generateRefreshToken(user, existingSession.id);
   } else {
     const session = await db.session.create({
       data: {
@@ -280,6 +283,13 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     });
     accessToken = await generateAccessToken(user, session.id);
     refreshToken = await generateRefreshToken(user, session.id);
+    await db.session.update({
+      where: { id: session.id },
+      data: {
+        refreshToken,
+        expiresAt: sessionExpiry,
+      },
+    });
   }
 
   res
@@ -508,51 +518,63 @@ const logoutAllSessions = asyncHandler(async (req, res) => {
   const sessionData = await db.session.deleteMany({
     where: {
       userId: id,
-      NOT:{
-        id: sessionId
-      }
-     },
+      NOT: {
+        id: sessionId,
+      },
+    },
   });
 
-  res.status(ResponseStatus.Success).json(new ApiResponse(ResponseStatus.Success, null, "logged from all other devices"))
-  
+  res
+    .status(ResponseStatus.Success)
+    .json(
+      new ApiResponse(
+        ResponseStatus.Success,
+        null,
+        "logged from all other devices"
+      )
+    );
 });
 
-const logoutFromSessionId = asyncHandler(async(req , res) =>{
-  const {sessionId} = req.params
- 
+const logoutFromSessionId = asyncHandler(async (req, res) => {
+  const { sessionId } = req.params;
 
-  if( !sessionId) throw new CustomError(400, "session Id doesnot exists") 
-
+  if (!sessionId) throw new CustomError(400, "session Id doesnot exists");
 
   await db.session.delete({
-    where:{id: sessionId}
-  })
+    where: { id: sessionId },
+  });
 
-  res.status(200).json(new ApiResponse(200, null, "logged out from session"))
+  res.status(200).json(new ApiResponse(200, null, "logged out from session"));
+});
 
-})
-
-const getAllSessions = asyncHandler(async (req, res) =>{
-  const {id } = req.user
+const getAllSessions = asyncHandler(async (req, res) => {
+  const { id } = req.user;
   const allActiveSessions = await db.session.findMany({
     where: {
-      userId: id
+      userId: id,
     },
-    select:{
+    select: {
       id: true,
-      ipAddress:true,
+      ipAddress: true,
       userAgent: true,
       createdAt: true,
       expiresAt: true,
     },
     orderBy: {
-      createdAt: "desc"
-    }
-  })
+      createdAt: "desc",
+    },
+  });
 
-  res.status(200).json(new ApiResponse( ResponseStatus.Success,allActiveSessions, "Sessions returned" ))
-})
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        ResponseStatus.Success,
+        allActiveSessions,
+        "Sessions returned"
+      )
+    );
+});
 
 export {
   registerUser,
@@ -564,6 +586,6 @@ export {
   resetPassword,
   refreshAccessToken,
   logoutAllSessions,
-  getAllSessions, 
-  logoutFromSessionId
+  getAllSessions,
+  logoutFromSessionId,
 };

@@ -23,6 +23,8 @@ const RegisterSchema = z.object({
     .min(6, { message: "Full name must be at least 6 characters long" })
     .max(20, { message: "Full name must be at most 20 characters long" })
     .optional(),
+
+  role: z.enum(['USER', 'ADMIN']).optional(),
 });
 
 const loginSchema = RegisterSchema.omit({

@@ -15,21 +15,21 @@ const exampleSchema = z.object({
     explaination: z.string().optional()
 })
 
-const approachSchema = z.object({
-    algorithm: z.string(),
-    implementation: z.any().optional(),
-    intuition: z.string().optional(),
-    timeComplexity: z.string(),
-})
+// const approachSchema = z.object({
+//     algorithm: z.string(),
+//     implementation: z.any().optional(),
+//     intuition: z.string().optional(),
+//     timeComplexity: z.string(),
+// })
 
-const editorialSchema = z.object({
-    heading: z.string().nonempty().min(3).max(50),
-    approaches: z.array(approachSchema).min(1).nonempty({message:"Atleast one approach is required"}),
-})
-const codeSnippetsShema = z.object({
-    language: z.string().nonempty({message:"language is required"}),
-    code: z.string().nonempty({message: "code is required"}),
-})
+// const editorialSchema = z.object({
+//     heading: z.string().nonempty().min(3).max(50),
+//     approaches: z.array(approachSchema).min(1).nonempty({message:"Atleast one approach is required"}),
+// })
+// const codeSnippetsShema = z.object({
+//     language: z.string().nonempty({message:"language is required"}),
+//     code: z.string().nonempty({message: "code is required"}),
+// })
 const testcaseSchema = z.object({
     input: z.string().nonempty({message: "input is required"}),
     expectedOutput: z.string().nonempty({message: "expected output is required"}),
@@ -45,15 +45,21 @@ export const problemSchema = z.object({
     examples: z.array(exampleSchema).min(1, { message: "at least one example"} ),
     constraints: z.array(z.string()).optional(),
     followUp: z.string().optional(),
-    editorial: z.array(editorialSchema).min(1).optional(),
-    codeSnippets: z.array(codeSnippetsShema).min(1, {message: "atleast one code snippet is required"}).optional(),
+    editorial: jsonSchema,
+    codeSnippets: jsonSchema,
     testcases: z.array(testcaseSchema).min(1, { message: "At least one testcase is required" }),
     referenceSolutions: jsonSchema
 })
 
+export const updateProblemSchema = problemSchema.partial()
+
 type problem = z.infer<typeof problemSchema>
+
 
 const validateProblem = (data: problem) =>{
      return problemSchema.safeParse(data)
 }
-export {validateProblem}
+const validateUpdateProblem = (data: Partial<problem>) =>{
+    return updateProblemSchema.safeParse(data)
+}
+export {validateProblem, validateUpdateProblem}
