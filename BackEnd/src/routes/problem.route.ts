@@ -8,7 +8,7 @@ router.use(isLoggedIn)
 router.post("/create", isLoggedIn, isAdmin, createProblem);
 router.get('/getAll', getAllProblems);
 router.get("/get/:problemId", getProblemById);
-router.put("/update/:problemId", isLoggedIn, isAdmin, updateProblem);
+router.patch("/update/:problemId", isLoggedIn, isAdmin, updateProblem);
 router.delete("/delete/:problemId", isLoggedIn, isAdmin, deleteProblem);
 // router.get('/getSolvedProblem', isLoggedIn, getSolvedProblem);
 

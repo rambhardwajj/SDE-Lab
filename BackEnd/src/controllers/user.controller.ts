@@ -108,7 +108,6 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
       fullName,
       avatarUrl,
       avatarLocalPath,
-      role,
       emailVerificationToken: hashedToken,
       emailVerificationExpiry: tokenExpiry,
     },
@@ -238,7 +237,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     throw new CustomError(ResponseStatus.Unauthorized, "Incorrect Password");
   }
 
-  console.log(user.id, userAgent, ipAddress);
+  // console.log(user.id, userAgent, ipAddress);
 
   const existingSession = await db.session.findFirst({
     where: {
@@ -247,7 +246,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
       ipAddress,
     },
   });
-  console.log(existingSession);
+  // console.log(existingSession);
 
   const activeSessions = await db.session.count({
     where: { userId: user.id },

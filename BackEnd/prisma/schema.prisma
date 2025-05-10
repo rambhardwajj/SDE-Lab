@@ -76,15 +76,15 @@ model Problem{
   editorial          Json?
   createdByUserId    String
 
-  codeSnippets       Json
-  testcases          Json
-  referenceSolutions Json? 
+  codeSnippets       Json[]
+  testcases          Json[]
+  referenceSolutions Json[]
 
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
   // Realtionship
-  user       User    @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+  user       User    @relation(fields: [createdByUserId], references: [id])
 
 }
 

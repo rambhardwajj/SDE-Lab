@@ -11,11 +11,10 @@ const errorHandler = ( error : any, req: Request, res: Response , next : NextFun
     }else if(error.code === 11000){
         const field = Object.keys(error.keyValue)[0];
         customError = new CustomError(409, `Duplicate value for field: ${field}`);
-    }else{
+    }
+    else{
         customError = new CustomError( ResponseStatus.InternalServerError, error.message,  )
     }
-
-
 
     logger.error("errorHandler Middleware executed", error?.message)
     res.status(customError.statusCode).json({

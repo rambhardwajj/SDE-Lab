@@ -3,8 +3,8 @@ import { CustomError } from "./CustomError";
 import { ResponseStatus } from "./constants";
 import { logger } from "./logger";
 
-const handleZodError = (result: SafeParseReturnType<any, any>) => {
-  console.log("zod mai aaya ")
+const handleZodError = <T>(result: SafeParseReturnType<unknown, T>): T => {
+  // console.log("zod mai aaya ")
   if (!result.success) {
     const missing = result.error.issues.find(
       (issue) => issue.code === "invalid_type" && issue.received === "undefined"

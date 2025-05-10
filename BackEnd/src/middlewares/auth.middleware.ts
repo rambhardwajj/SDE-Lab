@@ -9,14 +9,14 @@ import { DecodedUser } from "../types";
 
 const isLoggedIn = async (req: Request, res: Response, next: NextFunction) =>{
     const token  = req.cookies?.accessToken;
-    console.log("access " , token)
+    // console.log("access " , token)
 
     if( !token){
         throw new CustomError(ResponseStatus.Unauthorized, "Invalid token, Login failed")
     }
     try {
         const decoded = jwt.verify(token, envConfig.ACCESS_TOKEN_SECRET) 
-        console.log(decoded)
+        // console.log(decoded)
         req.user = decoded as DecodedUser
         next()
     } catch (error) {

@@ -17,7 +17,6 @@ const RegisterSchema = z.object({
         "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.",
     }),
 
-  avatar: z.string().optional(),
   fullName: z
     .string()
     .min(6, { message: "Full name must be at least 6 characters long" })
@@ -25,11 +24,11 @@ const RegisterSchema = z.object({
     .optional(),
 
   role: z.enum(['USER', 'ADMIN']).optional(),
+
 });
 
 const loginSchema = RegisterSchema.omit({
   userName: true,
-  avatar: true,
   fullName: true,
 });
 
