@@ -15,85 +15,162 @@ datasource db {
 }
 
 enum Role {
-  ADMIN 
+  ADMIN
   USER
 }
 
 enum Difficulty {
-  EASY 
+  EASY
   MEDIUM
-  HARD 
+  HARD
 }
 
 model Session {
-  id             String   @id @default(uuid())
-  refreshToken   String
-  userId         String
-  user           User     @relation(fields: [userId], references: [id])
-  userAgent      String?
-  ipAddress      String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  expiresAt      DateTime?
+  id                     String    @id @default(uuid())
+  refreshToken           String
+  userId                 String
+  user                   User      @relation(fields: [userId], references: [id])
+  userAgent              String?
+  ipAddress              String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  expiresAt              DateTime?
 }
 
 model User {
-  id                      String   @id @default(uuid())
-  userName                String   @unique
-  email                   String   @unique
-  password                String
-  fullName                String?
-  role                    Role      @default(USER) 
+  id                     String  @id @default(uuid())
+  userName               String  @unique
+  email                  String  @unique
+  password               String
+  fullName               String?
+  role                   Role    @default(USER)
 
-  avatarUrl               String?  // Optional
-  avatarLocalPath         String?  // remove 
+  avatarUrl              String? // Optional
+  avatarLocalPath        String? // remove 
 
-  isEmailVerified         Boolean  @default(false)
+  isEmailVerified        Boolean @default(false)
 
-  emailVerificationToken  String?  
+  emailVerificationToken String?
   emailVerificationExpiry DateTime?
-  resetPasswordToken      String?
-  resetPasswordExpiry     DateTime?
+  resetPasswordToken     String?
+  resetPasswordExpiry    DateTime?
 
-  sessions                Session[] 
+  sessions Session[]
 
-  createdAt               DateTime   @default(now())
-  updatedAt               DateTime   @updatedAt
-  Problem                 Problem[]  
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+  Problem                 Problem[]
+  Submission              Submission[]
+  ProblemSolved           ProblemSolved[]
+  Playlist                Playlist[]
 }
 
-model Problem{
-  id                 String     @id @default(uuid())
-  title              String     @unique
-  difficulty         Difficulty
-  tags               String[]
-  companies          String?
-  hints              String[]
-  description        String
-  examples           Json
-  constraints        String[]
-  followUp           String?
-  editorial          Json?
-  createdByUserId    String
+model Problem {
+  id              String     @id @default(uuid())
+  title           String     @unique
+  difficulty      Difficulty
+  tags            String[]
+  companies       String?
+  hints           String[]
+  description     String
+  examples        Json
+  constraints     String[]
+  followUp        String?
+  editorial       Json?
+  createdByUserId String
 
   codeSnippets       Json[]
   testcases          Json[]
   referenceSolutions Json[]
 
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  // Realtionship
-  user       User    @relation(fields: [createdByUserId], references: [id])
-
+  user              User                @relation(fields: [createdByUserId], references: [id])
+  submissions       Submission[]
+  solvedBy          ProblemSolved[]
+  problemInPlaylist ProblemInPlaylist[]
 }
 
-model Submissions {
-  id                 String     @id @default(uuid())
-  userId  String 
-  problemId  String
+model Submission {
+  id            String   @id @default(uuid())
+  userId        String
+  problemId     String
   submittedCode Json
-  language  String
-  status String
+  language      String
+  stdin         String?
+  stdout        String?
+  stderr        String?
+  compileOutput String?
+  status        String // Accepted , Wrong, Runtime Error, Time Limit Exceeded
+  memory        String?
+  time          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem   Problem          @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  testCases TestCaseResult[]
+}
+
+model TestCaseResult {
+  id            String  @id @default(uuid())
+  submissionId  String
+  testCase      Int
+  passed        Boolean
+  stdout        String?
+  expected      String
+  stderr        String?
+  compileOutput String?
+  status        String
+  memory        String?
+  time          String?
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+}
+
+model ProblemSolved {
+  id            String @id @default(uuid())
+  userId        String
+  problemId     String
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem       Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, problemId])
+}
+
+model Playlist {
+  id            String   @id @default(uuid())
+  name          String
+  description   String?
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  problems      ProblemInPlaylist[]
+  user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+}
+
+model ProblemInPlaylist {
+  id         String   @id @default(uuid())
+  playListId String
+  problemId  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  playlist Playlist @relation(fields: [playListId], references: [id], onDelete: Cascade)
+  problem  Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([playListId, problemId])
 }

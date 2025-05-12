@@ -30,10 +30,15 @@ const codeSnippetsSchema = z.object({
     language: z.string().nonempty({message:"language is required"}),
     code: z.string().nonempty({message: "code is required"}),
 })
-const testcaseSchema = z.object({
+export const referenceSolutionSchema = z.array(z.object({
+    language: z.string().nonempty({message:"language is required"}),
+    code: z.string().nonempty({message: "code is required"}),
+})).nonempty()
+
+export const testcaseSchema = z.array(z.object({
     input: z.string().nonempty({message: "input is required"}),
     expectedOutput: z.string().nonempty({message: "expected output is required"}),
-})
+})).min(1, "Atleast one test case is required")
 
 export const problemSchema = z.object({
     title: z.string().nonempty({message: "title is required"}), 
@@ -52,8 +57,8 @@ export const problemSchema = z.object({
     followUp: z.string().optional(),
     editorial: jsonSchema.optional(),
     codeSnippets: z.array(codeSnippetsSchema).nonempty(),
-    testcases: z.array(testcaseSchema).min(1, { message: "At least one testcase is required" }),
-    referenceSolutions: z.array(codeSnippetsSchema).nonempty()
+    testcases: testcaseSchema,
+    referenceSolutions: referenceSolutionSchema,
 })
 
 export const updateProblemSchema = problemSchema.partial()

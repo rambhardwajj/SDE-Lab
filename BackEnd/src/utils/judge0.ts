@@ -6,8 +6,15 @@ const languages = {
   "PYTHON": 71,
   "JAVA": 62,
   "JAVASCRIPT": 63,
-  "C++ (GCC 9.2.0)": 54,
 };
+
+export const languageCodes = {
+  71: "PYTHON",
+  62: "JAVA",
+  63: "JAVASCRIPT",
+}
+
+
 export const getJudge0LanguageById = (language: string) => {
   if (!(language in languages)) {
     throw new CustomError(
@@ -19,11 +26,15 @@ export const getJudge0LanguageById = (language: string) => {
   return languages[language.toUpperCase() as keyof typeof languages];
 };
 
+
+
 type SubmissionsType = {
   source_code: string;
   language_id: number;
-  stdin: string;
-  expected_output: string;
+  stdin?: string;
+  expected_output?: string;
+  base64_encoded?: boolean;
+  wait?: boolean;
 };
 type tokenType = { token: string };
 
@@ -44,18 +55,22 @@ type batchResponse = {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const submitBatch = async (submissions: SubmissionsType[]) => {
-  const { data } = await axios.post(
-    `${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=false`,
-    {
-      submissions,
-    }
-  );
-  // console.log(data)
-
-  return data as tokenType[];
+  try {
+    const { data } = await axios.post(
+      `${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=false`,
+      {
+        submissions,
+      }
+    );
+    // console.log(data);
+    return data as tokenType[];
+  } catch (error) {
+    throw new CustomError(500, "submit batch failed");
+  }
 };
 
 export const pollBatchResults = async (tokens: string[]) => {
+  console.log("Inside PollBatch Results");
   try {
     // console.log(tokens)
     while (true) {
@@ -69,11 +84,11 @@ export const pollBatchResults = async (tokens: string[]) => {
         }
       );
 
-      // console.log("data", data)
+      // console.log("data", data);
       if (!data.submissions || !Array.isArray(data.submissions)) {
         throw new CustomError(500, "Invalid response from Judge0 API");
       }
-      
+
       const results: batchResponse[] = data.submissions;
 
       const areAllDone = results.every(
@@ -84,6 +99,9 @@ export const pollBatchResults = async (tokens: string[]) => {
       await sleep(1000);
     }
   } catch (error: any) {
-    throw new CustomError(500, `Error while polling Judge0 submissions`);
+    throw new CustomError(
+      500,
+      `Error while polling Judge0 submissions : ${error}`
+    );
   }
 };

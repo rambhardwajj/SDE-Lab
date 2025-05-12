@@ -4,6 +4,7 @@ import cors from "cors";
 import { healthCheck } from './controllers/healthCheck.controller';
 import userRouter from "./routes/user.route"
 import problemRouter from "./routes/problem.route"
+import executeRouter from './routes/executeCode.route';
 import { errorHandler } from './middlewares/error.middleware';
 
 const app :Express  =  express();
@@ -16,6 +17,7 @@ app.use(cors())
 app.get('/', healthCheck)
 app.use("/api/v1/user", userRouter )
 app.use('/api/v1/problem', problemRouter)
+app.use('/api/v1/executeCode', executeRouter)
 
 
 app.use(errorHandler)

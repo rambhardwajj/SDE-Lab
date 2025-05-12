@@ -18,6 +18,8 @@ import {
 import { InputJsonValue } from "@prisma/client/runtime/library";
 
 const createProblem = asyncHandler(async (req: Request, res: Response) => {
+  console.log("Inside Create Problem controller")
+
   const {
     title,
     difficulty,
@@ -69,8 +71,11 @@ const createProblem = asyncHandler(async (req: Request, res: Response) => {
       }
     );
 
+    console.log("submission Result ke pehele tak")
+
     // this will return Object of Object of tokens
     const submissionResults = await submitBatch(submissions);
+    console.log("submission Result ke baad tak")
     console.log("Sub Res",submissionResults)
     const tokensArray = submissionResults.map((tokenObj) => {
       return tokenObj.token;
@@ -208,7 +213,7 @@ const updateProblem = asyncHandler(async (req, res) => {
   if (Object.keys(updatedPayload).length == 0)
     throw new CustomError(400, "no valid fields to update");
 
-  if( updatedPayload.referenceSolutions && testcases)  {
+  if( updatedPayload.referenceSolutions && updatedPayload.testcases)  {
     for (let i = 0; i < updatedPayload.referenceSolutions.length; i++) {
       const referenceSolution = updatedPayload.referenceSolutions[i];
       let language = referenceSolution.language;
