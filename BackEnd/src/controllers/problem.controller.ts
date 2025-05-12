@@ -218,7 +218,6 @@ const updateProblem = asyncHandler(async (req, res) => {
       const referenceSolution = updatedPayload.referenceSolutions[i];
       let language = referenceSolution.language;
       let solutionCode = referenceSolution.code;
-  
       const languageId = getJudge0LanguageById(language);
   
       // array of all submissions

@@ -103,7 +103,7 @@ model Submission {
   stderr        String?
   compileOutput String?
   status        String // Accepted , Wrong, Runtime Error, Time Limit Exceeded
-  memory        String?
+  memory        Int?
   time          String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -123,7 +123,7 @@ model TestCaseResult {
   stderr        String?
   compileOutput String?
   status        String
-  memory        String?
+  memory        Int?
   time          String?
 
   createdAt DateTime @default(now())

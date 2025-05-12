@@ -5396,8 +5396,18 @@ export namespace Prisma {
 
   export type AggregateSubmission = {
     _count: SubmissionCountAggregateOutputType | null
+    _avg: SubmissionAvgAggregateOutputType | null
+    _sum: SubmissionSumAggregateOutputType | null
     _min: SubmissionMinAggregateOutputType | null
     _max: SubmissionMaxAggregateOutputType | null
+  }
+
+  export type SubmissionAvgAggregateOutputType = {
+    memory: number | null
+  }
+
+  export type SubmissionSumAggregateOutputType = {
+    memory: number | null
   }
 
   export type SubmissionMinAggregateOutputType = {
@@ -5410,7 +5420,7 @@ export namespace Prisma {
     stderr: string | null
     compileOutput: string | null
     status: string | null
-    memory: string | null
+    memory: number | null
     time: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -5426,7 +5436,7 @@ export namespace Prisma {
     stderr: string | null
     compileOutput: string | null
     status: string | null
-    memory: string | null
+    memory: number | null
     time: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -5450,6 +5460,14 @@ export namespace Prisma {
     _all: number
   }
 
+
+  export type SubmissionAvgAggregateInputType = {
+    memory?: true
+  }
+
+  export type SubmissionSumAggregateInputType = {
+    memory?: true
+  }
 
   export type SubmissionMinAggregateInputType = {
     id?: true
@@ -5539,6 +5557,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: SubmissionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SubmissionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: SubmissionMinAggregateInputType
@@ -5569,6 +5599,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: SubmissionCountAggregateInputType | true
+    _avg?: SubmissionAvgAggregateInputType
+    _sum?: SubmissionSumAggregateInputType
     _min?: SubmissionMinAggregateInputType
     _max?: SubmissionMaxAggregateInputType
   }
@@ -5584,11 +5616,13 @@ export namespace Prisma {
     stderr: string | null
     compileOutput: string | null
     status: string
-    memory: string | null
+    memory: number | null
     time: string | null
     createdAt: Date
     updatedAt: Date
     _count: SubmissionCountAggregateOutputType | null
+    _avg: SubmissionAvgAggregateOutputType | null
+    _sum: SubmissionSumAggregateOutputType | null
     _min: SubmissionMinAggregateOutputType | null
     _max: SubmissionMaxAggregateOutputType | null
   }
@@ -5717,7 +5751,7 @@ export namespace Prisma {
       stderr: string | null
       compileOutput: string | null
       status: string
-      memory: string | null
+      memory: number | null
       time: string | null
       createdAt: Date
       updatedAt: Date
@@ -6157,7 +6191,7 @@ export namespace Prisma {
     readonly stderr: FieldRef<"Submission", 'String'>
     readonly compileOutput: FieldRef<"Submission", 'String'>
     readonly status: FieldRef<"Submission", 'String'>
-    readonly memory: FieldRef<"Submission", 'String'>
+    readonly memory: FieldRef<"Submission", 'Int'>
     readonly time: FieldRef<"Submission", 'String'>
     readonly createdAt: FieldRef<"Submission", 'DateTime'>
     readonly updatedAt: FieldRef<"Submission", 'DateTime'>
@@ -6613,10 +6647,12 @@ export namespace Prisma {
 
   export type TestCaseResultAvgAggregateOutputType = {
     testCase: number | null
+    memory: number | null
   }
 
   export type TestCaseResultSumAggregateOutputType = {
     testCase: number | null
+    memory: number | null
   }
 
   export type TestCaseResultMinAggregateOutputType = {
@@ -6629,7 +6665,7 @@ export namespace Prisma {
     stderr: string | null
     compileOutput: string | null
     status: string | null
-    memory: string | null
+    memory: number | null
     time: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -6645,7 +6681,7 @@ export namespace Prisma {
     stderr: string | null
     compileOutput: string | null
     status: string | null
-    memory: string | null
+    memory: number | null
     time: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -6671,10 +6707,12 @@ export namespace Prisma {
 
   export type TestCaseResultAvgAggregateInputType = {
     testCase?: true
+    memory?: true
   }
 
   export type TestCaseResultSumAggregateInputType = {
     testCase?: true
+    memory?: true
   }
 
   export type TestCaseResultMinAggregateInputType = {
@@ -6822,7 +6860,7 @@ export namespace Prisma {
     stderr: string | null
     compileOutput: string | null
     status: string
-    memory: string | null
+    memory: number | null
     time: string | null
     createdAt: Date
     updatedAt: Date
@@ -6940,7 +6978,7 @@ export namespace Prisma {
       stderr: string | null
       compileOutput: string | null
       status: string
-      memory: string | null
+      memory: number | null
       time: string | null
       createdAt: Date
       updatedAt: Date
@@ -7377,7 +7415,7 @@ export namespace Prisma {
     readonly stderr: FieldRef<"TestCaseResult", 'String'>
     readonly compileOutput: FieldRef<"TestCaseResult", 'String'>
     readonly status: FieldRef<"TestCaseResult", 'String'>
-    readonly memory: FieldRef<"TestCaseResult", 'String'>
+    readonly memory: FieldRef<"TestCaseResult", 'Int'>
     readonly time: FieldRef<"TestCaseResult", 'String'>
     readonly createdAt: FieldRef<"TestCaseResult", 'DateTime'>
     readonly updatedAt: FieldRef<"TestCaseResult", 'DateTime'>
@@ -11666,7 +11704,7 @@ export namespace Prisma {
     stderr?: StringNullableFilter<"Submission"> | string | null
     compileOutput?: StringNullableFilter<"Submission"> | string | null
     status?: StringFilter<"Submission"> | string
-    memory?: StringNullableFilter<"Submission"> | string | null
+    memory?: IntNullableFilter<"Submission"> | number | null
     time?: StringNullableFilter<"Submission"> | string | null
     createdAt?: DateTimeFilter<"Submission"> | Date | string
     updatedAt?: DateTimeFilter<"Submission"> | Date | string
@@ -11709,7 +11747,7 @@ export namespace Prisma {
     stderr?: StringNullableFilter<"Submission"> | string | null
     compileOutput?: StringNullableFilter<"Submission"> | string | null
     status?: StringFilter<"Submission"> | string
-    memory?: StringNullableFilter<"Submission"> | string | null
+    memory?: IntNullableFilter<"Submission"> | number | null
     time?: StringNullableFilter<"Submission"> | string | null
     createdAt?: DateTimeFilter<"Submission"> | Date | string
     updatedAt?: DateTimeFilter<"Submission"> | Date | string
@@ -11734,8 +11772,10 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: SubmissionCountOrderByAggregateInput
+    _avg?: SubmissionAvgOrderByAggregateInput
     _max?: SubmissionMaxOrderByAggregateInput
     _min?: SubmissionMinOrderByAggregateInput
+    _sum?: SubmissionSumOrderByAggregateInput
   }
 
   export type SubmissionScalarWhereWithAggregatesInput = {
@@ -11752,7 +11792,7 @@ export namespace Prisma {
     stderr?: StringNullableWithAggregatesFilter<"Submission"> | string | null
     compileOutput?: StringNullableWithAggregatesFilter<"Submission"> | string | null
     status?: StringWithAggregatesFilter<"Submission"> | string
-    memory?: StringNullableWithAggregatesFilter<"Submission"> | string | null
+    memory?: IntNullableWithAggregatesFilter<"Submission"> | number | null
     time?: StringNullableWithAggregatesFilter<"Submission"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Submission"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Submission"> | Date | string
@@ -11771,7 +11811,7 @@ export namespace Prisma {
     stderr?: StringNullableFilter<"TestCaseResult"> | string | null
     compileOutput?: StringNullableFilter<"TestCaseResult"> | string | null
     status?: StringFilter<"TestCaseResult"> | string
-    memory?: StringNullableFilter<"TestCaseResult"> | string | null
+    memory?: IntNullableFilter<"TestCaseResult"> | number | null
     time?: StringNullableFilter<"TestCaseResult"> | string | null
     createdAt?: DateTimeFilter<"TestCaseResult"> | Date | string
     updatedAt?: DateTimeFilter<"TestCaseResult"> | Date | string
@@ -11808,7 +11848,7 @@ export namespace Prisma {
     stderr?: StringNullableFilter<"TestCaseResult"> | string | null
     compileOutput?: StringNullableFilter<"TestCaseResult"> | string | null
     status?: StringFilter<"TestCaseResult"> | string
-    memory?: StringNullableFilter<"TestCaseResult"> | string | null
+    memory?: IntNullableFilter<"TestCaseResult"> | number | null
     time?: StringNullableFilter<"TestCaseResult"> | string | null
     createdAt?: DateTimeFilter<"TestCaseResult"> | Date | string
     updatedAt?: DateTimeFilter<"TestCaseResult"> | Date | string
@@ -11849,7 +11889,7 @@ export namespace Prisma {
     stderr?: StringNullableWithAggregatesFilter<"TestCaseResult"> | string | null
     compileOutput?: StringNullableWithAggregatesFilter<"TestCaseResult"> | string | null
     status?: StringWithAggregatesFilter<"TestCaseResult"> | string
-    memory?: StringNullableWithAggregatesFilter<"TestCaseResult"> | string | null
+    memory?: IntNullableWithAggregatesFilter<"TestCaseResult"> | number | null
     time?: StringNullableWithAggregatesFilter<"TestCaseResult"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"TestCaseResult"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"TestCaseResult"> | Date | string
@@ -12419,7 +12459,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -12439,7 +12479,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -12455,7 +12495,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12475,7 +12515,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12493,7 +12533,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -12508,7 +12548,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12525,7 +12565,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12540,7 +12580,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -12557,7 +12597,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -12572,7 +12612,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12589,7 +12629,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12605,7 +12645,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -12620,7 +12660,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12636,7 +12676,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13300,6 +13340,17 @@ export namespace Prisma {
     _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type ProblemScalarRelationFilter = {
     is?: ProblemWhereInput
     isNot?: ProblemWhereInput
@@ -13332,6 +13383,10 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type SubmissionAvgOrderByAggregateInput = {
+    memory?: SortOrder
+  }
+
   export type SubmissionMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -13362,6 +13417,26 @@ export namespace Prisma {
     time?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type SubmissionSumOrderByAggregateInput = {
+    memory?: SortOrder
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -13398,6 +13473,7 @@ export namespace Prisma {
 
   export type TestCaseResultAvgOrderByAggregateInput = {
     testCase?: SortOrder
+    memory?: SortOrder
   }
 
   export type TestCaseResultMaxOrderByAggregateInput = {
@@ -13434,6 +13510,7 @@ export namespace Prisma {
 
   export type TestCaseResultSumOrderByAggregateInput = {
     testCase?: SortOrder
+    memory?: SortOrder
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -14019,6 +14096,14 @@ export namespace Prisma {
     connect?: TestCaseResultWhereUniqueInput | TestCaseResultWhereUniqueInput[]
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type UserUpdateOneRequiredWithoutSubmissionNestedInput = {
     create?: XOR<UserCreateWithoutSubmissionInput, UserUncheckedCreateWithoutSubmissionInput>
     connectOrCreate?: UserCreateOrConnectWithoutSubmissionInput
@@ -14424,6 +14509,33 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -14648,7 +14760,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -14666,7 +14778,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -14834,7 +14946,7 @@ export namespace Prisma {
     stderr?: StringNullableFilter<"Submission"> | string | null
     compileOutput?: StringNullableFilter<"Submission"> | string | null
     status?: StringFilter<"Submission"> | string
-    memory?: StringNullableFilter<"Submission"> | string | null
+    memory?: IntNullableFilter<"Submission"> | number | null
     time?: StringNullableFilter<"Submission"> | string | null
     createdAt?: DateTimeFilter<"Submission"> | Date | string
     updatedAt?: DateTimeFilter<"Submission"> | Date | string
@@ -14953,7 +15065,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -14971,7 +15083,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -15257,7 +15369,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -15272,7 +15384,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -15427,7 +15539,7 @@ export namespace Prisma {
     stderr?: StringNullableFilter<"TestCaseResult"> | string | null
     compileOutput?: StringNullableFilter<"TestCaseResult"> | string | null
     status?: StringFilter<"TestCaseResult"> | string
-    memory?: StringNullableFilter<"TestCaseResult"> | string | null
+    memory?: IntNullableFilter<"TestCaseResult"> | number | null
     time?: StringNullableFilter<"TestCaseResult"> | string | null
     createdAt?: DateTimeFilter<"TestCaseResult"> | Date | string
     updatedAt?: DateTimeFilter<"TestCaseResult"> | Date | string
@@ -15442,7 +15554,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -15461,7 +15573,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -15492,7 +15604,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15511,7 +15623,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16064,7 +16176,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -16187,7 +16299,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16205,7 +16317,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16222,7 +16334,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16285,7 +16397,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -16314,7 +16426,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16332,7 +16444,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16349,7 +16461,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16406,7 +16518,7 @@ export namespace Prisma {
     stderr?: string | null
     compileOutput?: string | null
     status: string
-    memory?: string | null
+    memory?: number | null
     time?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -16421,7 +16533,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16436,7 +16548,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16451,7 +16563,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compileOutput?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
-    memory?: NullableStringFieldUpdateOperationsInput | string | null
+    memory?: NullableIntFieldUpdateOperationsInput | number | null
     time?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
