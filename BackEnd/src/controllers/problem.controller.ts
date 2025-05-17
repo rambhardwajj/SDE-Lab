@@ -206,9 +206,11 @@ const updateProblem = asyncHandler(async (req, res) => {
   if (followUp !== undefined) updatedPayload.followUp = followUp;
   if (editorial !== undefined) updatedPayload.editorial = editorial;
   if (codeSnippets !== undefined) updatedPayload.codeSnippets = codeSnippets;
-  if (testcases !== undefined) updatedPayload.testcases = testcases;
-  if (referenceSolutions !== undefined)
+  // console.log(referenceSolutions)
+  if (testcases !== undefined && referenceSolutions !== undefined){ 
+    updatedPayload.testcases = testcases;
     updatedPayload.referenceSolutions = referenceSolutions;
+  }
 
   if (Object.keys(updatedPayload).length == 0)
     throw new CustomError(400, "no valid fields to update");
@@ -251,7 +253,7 @@ const updateProblem = asyncHandler(async (req, res) => {
       for (let j = 0; j < results.length; j++) {
         const result = results[j];
         if (result.status.id !== 3) {
-          throw new CustomError(400, `result ${j + 1} is Wrong`);
+          throw new CustomError(400, `result ${j + 1} is Wrong in update`);
         }
       }
     }
@@ -280,10 +282,32 @@ const deleteProblem = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, deletedProblem, "Problem deleted successfully"));
 });
 
+const getAllProblemsSolvedByUser = asyncHandler(async(req , res)=>{
+  const problems = await db.problem.findMany({
+    where:{
+      solvedBy:{
+        some:{
+          userId:req.user.id 
+        }
+      }
+    },
+    include:{
+      solvedBy:{
+        where:{
+          userId:req.user.id
+        }
+      }
+    }
+  })
+  
+  res.status(200).json(new ApiResponse(200, problems, "Problem fetched"))
+})
+
 export {
   createProblem,
   getAllProblems,
   getProblemById,
   updateProblem,
   deleteProblem,
+  getAllProblemsSolvedByUser
 };

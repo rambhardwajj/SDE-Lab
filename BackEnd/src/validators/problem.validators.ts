@@ -14,6 +14,7 @@ const exampleSchema = z.object({
     explaination: z.string().optional()
 })
 
+
 // const approachSchema = z.object({
 //     algorithm: z.string(),
 //     implementation: z.any().optional(),
@@ -64,8 +65,11 @@ export const problemSchema = z.object({
 export const updateProblemSchema = problemSchema.partial()
 
 type problem = z.infer<typeof problemSchema>
+// type problemIds = z.infer<typeof problemIdsSchema>
 
-
+// const validateProblemIds=(data : problemIds) =>{
+//     return problemIdsSchema.safeParse(data)
+// }
 const validateProblem = (data: problem) =>{
      return problemSchema.safeParse(data)
 }

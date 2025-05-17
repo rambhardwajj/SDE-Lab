@@ -169,8 +169,8 @@ model ProblemInPlaylist {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  playlist Playlist @relation(fields: [playListId], references: [id], onDelete: Cascade)
-  problem  Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  playlist   Playlist @relation(fields: [playListId], references: [id], onDelete: Cascade)
+  problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
   @@unique([playListId, problemId])
 }

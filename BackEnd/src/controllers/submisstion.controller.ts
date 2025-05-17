@@ -9,7 +9,6 @@ const getAllUserSubmission = asyncHandler(async (req, res) => {
       userId: userId,
     },
   });
-
   res
     .status(200)
     .json(

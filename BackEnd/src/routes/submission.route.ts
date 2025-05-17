@@ -6,6 +6,6 @@ import { getAllSubmissionsForProblem, getAllUserSubmission, getUserSubmissionsFo
 const router = Router();
 
 router.get('/getAllUserSubmissions', isLoggedIn, getAllUserSubmission)
-router.get('/getUserSubmissionsForProblem', isLoggedIn, getUserSubmissionsForProblem)
-router.get('getAllSubmissionsForProblem', isLoggedIn, getAllSubmissionsForProblem)
+router.get('/getUserSubmissionsForProblem/:problemId', isLoggedIn, getUserSubmissionsForProblem)
+router.get('/getAllSubmissionsForProblem/:problemId', isLoggedIn, getAllSubmissionsForProblem)
 export default router

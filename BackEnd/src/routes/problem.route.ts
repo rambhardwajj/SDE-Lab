@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 import { isAdmin, isLoggedIn } from "../middlewares/auth.middleware";
-import { createProblem, deleteProblem, getAllProblems, getProblemById, updateProblem } from "../controllers/problem.controller";
+import { createProblem, deleteProblem, getAllProblems, getAllProblemsSolvedByUser, getProblemById, updateProblem } from "../controllers/problem.controller";
 
 const router = Router()
 router.use(isLoggedIn)
@@ -10,6 +10,6 @@ router.get('/getAll', getAllProblems);
 router.get("/get/:problemId", getProblemById);
 router.patch("/update/:problemId", isLoggedIn, isAdmin, updateProblem);
 router.delete("/delete/:problemId", isLoggedIn, isAdmin, deleteProblem);
-// router.get('/getSolvedProblem', isLoggedIn, getSolvedProblem);
+router.get('/getSolvedProblem', isLoggedIn, getAllProblemsSolvedByUser);
 
 export default router;

@@ -187,7 +187,7 @@ const executeCode = asyncHandler(async (req, res) => {
       throw new CustomError(500, "Invalid reference solutions");
     }
     const allRefsSolutions = allRefs.data;
-
+    console.log(allRefsSolutions)
     // language nikalo to jo user ke code pe hai
     const currLanguage =
       languageCodes[language_id as keyof typeof languageCodes];
@@ -196,6 +196,7 @@ const executeCode = asyncHandler(async (req, res) => {
     const requiredRefSolution = allRefsSolutions.find(
       (solution) => solution.language === currLanguage
     );
+    console.log( "reqRefSol" , requiredRefSolution)
 
     if (!requiredRefSolution)
       throw new CustomError(

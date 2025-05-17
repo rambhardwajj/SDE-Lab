@@ -110,6 +110,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
       avatarLocalPath,
       emailVerificationToken: hashedToken,
       emailVerificationExpiry: tokenExpiry,
+      role
     },
   });
 
